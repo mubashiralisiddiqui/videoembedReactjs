@@ -1,25 +1,62 @@
+/**
+ *  import modules
+ */
 import React, { Component } from 'react';
-import logo from './logo.svg';
+
+import { SearchBar, Videos } from './components'
 import './App.css';
 
+/**
+ * Start of App container
+ */
 class App extends Component {
+  /**
+   * initailizing states
+   */
+  state = {
+    url: '',
+    valid: false
+  }
+  // change handler input 
+  handleChange = (e) => {
+    let querry = e.target.value;
+    let video_id = querry.split('v=')[1];
+    const ampersandPosition = video_id && video_id.indexOf('&');
+    if (video_id && ampersandPosition != -1) {
+      video_id = video_id && video_id.substring(0, ampersandPosition);
+    }
+    let sourceUrl = '';
+    if (querry.includes('facebook.com')) {
+      sourceUrl = `https://www.facebook.com/plugins/video.php?href=${querry}`
+    }
+    else if (querry.includes('youtube.com' && video_id)) {
+      sourceUrl = `https://www.youtube.com/embed/${video_id}`
+    }
+    else if (querry.includes('vimeo.com')) {
+      let vimeo_id = querry.split('com/')[1]
+      sourceUrl = `https://player.vimeo.com/video/${vimeo_id && vimeo_id}`
+    }
+    else {
+      window.open(`${querry}`, '_blank')
+      return;
+    }
+    
+    this.setState({
+      url: sourceUrl,
+      valid: true
+    })
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div className="App viewport">
+        <SearchBar
+          onblur={(e) => this.handleChange(e)}
+        />
+        <Videos
+          src={this.state.url}
+          valid={this.state.valid}
+        />
       </div>
     );
   }
