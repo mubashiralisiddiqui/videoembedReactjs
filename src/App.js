@@ -2,6 +2,7 @@
  *  import modules
  */
 import React, { Component } from 'react';
+import axios from 'axios'
 
 import { SearchBar, Videos } from './components'
 import './App.css';
@@ -15,7 +16,8 @@ class App extends Component {
    */
   state = {
     url: '',
-    valid: false
+    valid: false,
+    imageurl: ''
   }
   // change handler input 
   handleChange = (e) => {
@@ -31,6 +33,17 @@ class App extends Component {
     }
     else if (querry.includes('youtube.com' && video_id)) {
       sourceUrl = `https://www.youtube.com/embed/${video_id}`
+      axios.get(`https://api.microlink.io/?url=${querry}`).then((prev) => {
+        console.log(prev.data.data.image.url)
+        let imageurl = prev.data.data.image.url
+        this.setState({
+          imageurl
+        })
+      })
+        .catch((err) => {
+          console.log(err)
+
+        })
     }
     else if (querry.includes('vimeo.com')) {
       let vimeo_id = querry.split('com/')[1]
@@ -40,7 +53,7 @@ class App extends Component {
       window.open(`${querry}`, '_blank')
       return;
     }
-    
+
     this.setState({
       url: sourceUrl,
       valid: true
@@ -48,14 +61,17 @@ class App extends Component {
   }
 
   render() {
+    const { url, imageurl, valid } = this.state
     return (
       <div className="App viewport">
         <SearchBar
           onblur={(e) => this.handleChange(e)}
+          imageurl={imageurl}
         />
         <Videos
-          src={this.state.url}
-          valid={this.state.valid}
+          src={url}
+          valid={valid}
+
         />
       </div>
     );
