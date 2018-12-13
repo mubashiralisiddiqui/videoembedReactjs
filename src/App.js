@@ -71,7 +71,6 @@ class App extends Component {
         <Videos
           src={url}
           valid={valid}
-
         />
       </div>
     );
