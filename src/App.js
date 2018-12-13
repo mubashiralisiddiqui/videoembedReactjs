@@ -3,8 +3,10 @@
  */
 import React, { Component } from 'react';
 import axios from 'axios'
+import { connect } from 'react-redux';
 
 import { SearchBar, Videos } from './components'
+import { AuthAction } from './redux/actions'
 import './App.css';
 
 /**
@@ -17,64 +19,114 @@ class App extends Component {
   state = {
     url: '',
     valid: false,
-    imageurl: ''
+    imageurl: '',
+    loading: false,
+    description: '',
+    title: '',
+    previewUrl: ''
   }
   // change handler input 
   handleChange = (e) => {
+
     let querry = e.target.value;
     let video_id = querry.split('v=')[1];
     const ampersandPosition = video_id && video_id.indexOf('&');
-    if (video_id && ampersandPosition != -1) {
+    if (video_id && ampersandPosition !== -1) {
       video_id = video_id && video_id.substring(0, ampersandPosition);
     }
     let sourceUrl = '';
     if (querry.includes('facebook.com')) {
       sourceUrl = `https://www.facebook.com/plugins/video.php?href=${querry}`
+      this.handlePreview(querry, sourceUrl)
     }
     else if (querry.includes('youtube.com' && video_id)) {
       sourceUrl = `https://www.youtube.com/embed/${video_id}`
-      axios.get(`https://api.microlink.io/?url=${querry}`).then((prev) => {
-        console.log(prev.data.data.image.url)
-        let imageurl = prev.data.data.image.url
-        this.setState({
-          imageurl
-        })
-      })
-        .catch((err) => {
-          console.log(err)
-
-        })
+      this.handlePreview(querry, sourceUrl)
     }
     else if (querry.includes('vimeo.com')) {
-      let vimeo_id = querry.split('com/')[1]
+      const vimeo_id = querry.split('com/')[1]
       sourceUrl = `https://player.vimeo.com/video/${vimeo_id && vimeo_id}`
+      this.handlePreview(querry, sourceUrl)
     }
     else {
       window.open(`${querry}`, '_blank')
       return;
     }
+  }
+  // handle url preview
+  handlePreview = (querry, sourceUrl) => {
 
     this.setState({
-      url: sourceUrl,
-      valid: true
+      loading: true,
+      imageurl: '',
+      url: '',
+      valid: false,
     })
+
+    axios.get(`https://api.microlink.io/?url=${querry}`).then((preview) => {
+      const imageurl = preview && preview.data.data.image.url
+      const description = preview && preview.data.data.description
+      const title = preview && preview.data.data.title;
+      const previewUrl = preview && preview.data.data.url
+      let obj = {
+        imageurl,
+        description,
+        title,
+        previewUrl
+      }
+      this.props.getDetails(obj)
+      this.setState({
+        imageurl,
+        url: sourceUrl,
+        valid: true,
+        loading: false,
+        description,
+        title,
+        previewUrl
+      })
+    })
+
+      .catch((err) => {
+        console.log(err)
+        this.setState({
+          loading: false
+        })
+
+      })
   }
 
   render() {
-    const { url, imageurl, valid } = this.state
+    const { url, imageurl, valid, loading, title, previewUrl, description } = this.state
     return (
       <div className="App viewport">
         <SearchBar
           onblur={(e) => this.handleChange(e)}
           imageurl={imageurl}
+          loading={loading}
+          title={title}
+          description={description}
+          previewUrl={previewUrl}
         />
         <Videos
           src={url}
           valid={valid}
+          loading={loading}
         />
       </div>
     );
   }
 }
+// getting states from redux store
+const mapstateToProps = (state) => {
+  return {
+    //  details:
+  }
 
-export default App;
+}
+// dispathing actions from redux store
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getDetails: (payload) => dispatch(AuthAction.getLinkDetails(payload))
+  }
+}
+export default connect(mapstateToProps, mapDispatchToProps)(App);

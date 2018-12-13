@@ -11,14 +11,18 @@ import ImagePreview from '../UrlPreview'
 */
 export default class SearchBar extends Component {
     render() {
-        const { onblur, imageurl } = this.props
+        const { onblur, imageurl, loading, title, previewUrl, description } = this.props;
         return (
-            <div className="container form-row align-items-center">
+            <div className="container">
                 <input type="text" className="form-control input" id="inlineFormInputGroup"
                     onBlur={(e) => onblur(e)}
                     placeholder="Username" />
                 <ImagePreview
                     src={imageurl}
+                    loading={loading}
+                    title={title}
+                    previewUrl={previewUrl}
+                    description={description}
                 />
                 {/* <button
                     className="btn"><i className="fa fa-search"></i> search</button> */}

@@ -1,18 +1,9 @@
 export class AuthAction {
-    // static LOGIN = "LOGIN";
-    // static LOGOUT = "LOGOUT";
+    static DETAILS = "DETAILS";
 
-    static userLogin = (payload) => ({
-        type: AuthAction.LOGIN,
-        payload
-    })
-    static logout = (payload) => ({
-        type: AuthAction.LOGOUT,
+    static getLinkDetails = (payload) => ({
+        type: AuthAction.DETAILS,
         payload
     })
 
-    static alreadyLogin = (payload) => ({
-        type: AuthAction.ALREADYLOGIN,
-        payload
-    })
 }
