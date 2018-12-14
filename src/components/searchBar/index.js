@@ -16,7 +16,7 @@ export default class SearchBar extends Component {
             <div className="container">
                 <input type="text" className="form-control input" id="inlineFormInputGroup"
                     onBlur={(e) => onblur(e)}
-                    placeholder="Username" />
+                    placeholder="paste url of videos .." />
                 <ImagePreview
                     src={imageurl}
                     loading={loading}
