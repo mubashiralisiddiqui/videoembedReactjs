@@ -13,7 +13,7 @@ export default class PreviewUrl extends Component {
     render() {
         const { src = "", loading, title, previewUrl, description = "description" } = this.props
         return (
-            <div className="container">
+            <div className="previw">
                 {loading ?
                     <p style={{ color: 'white' }}> loading . . .  </p>
                     :
@@ -25,7 +25,6 @@ export default class PreviewUrl extends Component {
                                     style={{ height: "200px", width: "100%" }}
                                 />
                             </div>
-
                             <div className="descContainer" >
                                 <p className="url" >{previewUrl && previewUrl}</p>
                                 <p className="title">{title && title}</p>

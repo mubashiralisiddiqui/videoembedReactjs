@@ -23,12 +23,13 @@ class App extends Component {
     loading: false,
     description: '',
     title: '',
-    previewUrl: ''
+    previewUrl: '',
+    querry: ''
   }
   // change handler input 
-  handleChange = (e) => {
+  handleChange = (querry, type) => {
+    console.log(type)
 
-    let querry = e.target.value;
     let video_id = querry.split('v=')[1];
     const ampersandPosition = video_id && video_id.indexOf('&');
     if (video_id && ampersandPosition !== -1) {
@@ -37,16 +38,16 @@ class App extends Component {
     let sourceUrl = '';
     if (querry.includes('facebook.com')) {
       sourceUrl = `https://www.facebook.com/plugins/video.php?href=${querry}`
-      this.handlePreview(querry, sourceUrl)
+      this.handlePreview(querry, sourceUrl, type)
     }
     else if (querry.includes('youtube.com' && video_id)) {
       sourceUrl = `https://www.youtube.com/embed/${video_id}`
-      this.handlePreview(querry, sourceUrl)
+      this.handlePreview(querry, sourceUrl, type)
     }
     else if (querry.includes('vimeo.com')) {
       const vimeo_id = querry.split('com/')[1]
       sourceUrl = `https://player.vimeo.com/video/${vimeo_id && vimeo_id}`
-      this.handlePreview(querry, sourceUrl)
+      this.handlePreview(querry, sourceUrl, type)
     }
     else {
       window.open(`${querry}`, '_blank')
@@ -54,8 +55,7 @@ class App extends Component {
     }
   }
   // handle url preview
-  handlePreview = (querry, sourceUrl) => {
-
+  handlePreview = (querry, sourceUrl, type) => {
     this.setState({
       loading: true,
       imageurl: '',
@@ -75,14 +75,24 @@ class App extends Component {
         previewUrl
       }
       this.props.getDetails(obj)
+      if (type === "submit") {
+        this.setState({
+          imageurl,
+          url: sourceUrl,
+          valid: true,
+          loading: false,
+          description,
+          title,
+          previewUrl
+        })
+        return
+      }
       this.setState({
         imageurl,
-        url: sourceUrl,
-        valid: true,
-        loading: false,
         description,
         title,
-        previewUrl
+        previewUrl,
+        loading: false,
       })
     })
 
@@ -95,12 +105,16 @@ class App extends Component {
       })
   }
 
+  handleSubmit() {
+
+  }
+
   render() {
     const { url, imageurl, valid, loading, title, previewUrl, description } = this.state
     return (
       <div className="App viewport">
         <SearchBar
-          onblur={(e) => this.handleChange(e)}
+          onblur={(e, type) => this.handleChange(e, type)}
           imageurl={imageurl}
           loading={loading}
           title={title}
