@@ -1,20 +1,19 @@
 /**
  * importing action
  */
-import { AuthAction } from '../actions/';
+import { FetchActions } from "../actions/";
 /**
  * initializing states
  */
 const initialState = {
-    details: {}
-
-}
+  details: {}
+};
 // reducer
-export default function (state = initialState, action) {
-    switch (action.type) {
-        case AuthAction.DETAILS:
-            return { ...state, details: action.payload };
-        default:
-            return state;
-    }
+export default function(state = initialState, action) {
+  switch (action.type) {
+    case FetchActions.DETAILS:
+      return { ...state, details: action.payload };
+    default:
+      return state;
+  }
 }

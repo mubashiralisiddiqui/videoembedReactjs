@@ -1,146 +1,126 @@
-/**
- *  import modules
- */
-import React, { Component } from 'react';
-import axios from 'axios'
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import axios from "axios";
+import { connect } from "react-redux";
 
-import { SearchBar, Videos } from './components'
-import { AuthAction } from './redux/actions'
-import './App.css';
+import { SearchBar, Videos } from "./components";
+import { FetchActions } from "./redux/actions";
+import "./App.css";
 
-/**
- * Start of App container
- */
 class App extends Component {
   /**
-   * initailizing states
+   * initializing states
    */
   state = {
-    url: '',
-    valid: false,
-    imageurl: '',
+    url: null,
+    imageUrl: null,
     loading: false,
-    description: '',
-    title: '',
-    previewUrl: '',
-    querry: ''
-  }
-  // change handler input 
-  handleChange = (querry, type) => {
-    console.log(type)
-
-    let video_id = querry.split('v=')[1];
-    const ampersandPosition = video_id && video_id.indexOf('&');
+    description: "",
+    title: "",
+    previewUrl: ""
+  };
+  // search url
+  urlSearch = query => {
+    this.setState({
+      loading: true,
+      url: null
+    });
+    let video_id = query.split("v=")[1];
+    const ampersandPosition = video_id && video_id.indexOf("&");
     if (video_id && ampersandPosition !== -1) {
       video_id = video_id && video_id.substring(0, ampersandPosition);
     }
-    let sourceUrl = '';
-    if (querry.includes('facebook.com')) {
-      sourceUrl = `https://www.facebook.com/plugins/video.php?href=${querry}`
-      this.handlePreview(querry, sourceUrl, type)
-    }
-    else if (querry.includes('youtube.com' && video_id)) {
-      sourceUrl = `https://www.youtube.com/embed/${video_id}`
-      this.handlePreview(querry, sourceUrl, type)
-    }
-    else if (querry.includes('vimeo.com')) {
-      const vimeo_id = querry.split('com/')[1]
-      sourceUrl = `https://player.vimeo.com/video/${vimeo_id && vimeo_id}`
-      this.handlePreview(querry, sourceUrl, type)
-    }
-    else {
-      window.open(`${querry}`, '_blank')
+    let sourceUrl = "";
+    if (query.includes("facebook.com") && query.includes("video")) {
+      sourceUrl = `https://www.facebook.com/plugins/video.php?href=${query}/&width=600&height=400`;
+      this.setState({ url: sourceUrl, loading: false });
+    } else if (query.includes("youtube.com" && video_id)) {
+      sourceUrl = `https://www.youtube.com/embed/${video_id}`;
+      this.setState({ url: sourceUrl, loading: false });
+    } else if (query.includes("vimeo.com")) {
+      const vimeo_id = query.split("com/")[1];
+      sourceUrl = `https://player.vimeo.com/video/${vimeo_id && vimeo_id}`;
+      this.setState({ url: sourceUrl, loading: false });
+    } else {
+      this.setState({ loading: false });
+      window.open(`${query}`, "_blank");
       return;
     }
-  }
+  };
   // handle url preview
-  handlePreview = (querry, sourceUrl, type) => {
+  urlPreview = url => {
     this.setState({
       loading: true,
-      imageurl: '',
-      url: '',
-      valid: false,
-    })
-
-    axios.get(`https://api.microlink.io/?url=${querry}`).then((preview) => {
-      const imageurl = preview && preview.data.data.image.url
-      const description = preview && preview.data.data.description
-      const title = preview && preview.data.data.title;
-      const previewUrl = preview && preview.data.data.url
-      let obj = {
-        imageurl,
-        description,
-        title,
-        previewUrl
-      }
-      this.props.getDetails(obj)
-      if (type === "submit") {
-        this.setState({
-          imageurl,
-          url: sourceUrl,
-          valid: true,
-          loading: false,
+      imageUrl: ""
+    });
+    axios
+      .get(`https://api.microlink.io/?url=${url}`)
+      .then(preview => {
+        const imageUrl = preview && preview.data.data.image.url;
+        const description = preview && preview.data.data.description;
+        const title = preview && preview.data.data.title;
+        const previewUrl = preview && preview.data.data.url;
+        let obj = {
+          imageUrl,
           description,
           title,
           previewUrl
-        })
-        return
-      }
-      this.setState({
-        imageurl,
-        description,
-        title,
-        previewUrl,
-        loading: false,
+        };
+        this.props.getDetails(obj);
+        this.setState({
+          imageUrl,
+          description,
+          title,
+          previewUrl,
+          loading: false
+        });
       })
-    })
-
-      .catch((err) => {
-        console.log(err)
+      .catch(err => {
         this.setState({
           loading: false
-        })
-
-      })
-  }
-
-  handleSubmit() {
-
-  }
+        });
+      });
+  };
 
   render() {
-    const { url, imageurl, valid, loading, title, previewUrl, description } = this.state
+    const {
+      url,
+      imageUrl,
+      valid,
+      loading,
+      title,
+      previewUrl,
+      description
+    } = this.state;
     return (
       <div className="App viewport">
         <SearchBar
-          onblur={(e, type) => this.handleChange(e, type)}
-          imageurl={imageurl}
+          urlPreview={url => this.urlPreview(url)}
+          urlSearch={url => this.urlSearch(url)}
+          imageUrl={imageUrl}
           loading={loading}
           title={title}
           description={description}
           previewUrl={previewUrl}
         />
-        <Videos
-          src={url}
-          valid={valid}
-          loading={loading}
-        />
+        <Videos src={url} valid={valid} loading={loading} />
       </div>
     );
   }
 }
 // getting states from redux store
-const mapstateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     //  details:
-  }
-
-}
-// dispathing actions from redux store
-const mapDispatchToProps = (dispatch) => {
+  };
+};
+// dispatching actions from redux store
+const mapDispatchToProps = dispatch => {
   return {
-    getDetails: (payload) => dispatch(AuthAction.getLinkDetails(payload))
-  }
-}
-export default connect(mapstateToProps, mapDispatchToProps)(App);
+    getDetails: payload => dispatch(FetchActions.getLinkDetails(payload))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

@@ -1,37 +1,17 @@
+import React, { Component } from "react";
 
-/**
- * importing modules
- */
-import React, { Component } from 'react';
-
-import './style.css'
-
-
+import "./style.css";
 
 export default class SearchBar extends Component {
-
-    render() {
-        const { src, valid, loading } = this.props
-        return (
-            <div className="videocontainer">
-                {(loading ?
-                    <p style={{ color: 'white' }}> loading . . .  </p> :
-                    null)
-                }
-                {
-                    valid ?
-
-                        < iframe width="80%" height="360px"
-                            title="play"
-                            src={src}
-                            allowFullScreen
-                        >
-                        </iframe>
-                        : null
-                }
-
-            </div >
-        )
-
-    }
+  render() {
+    const { src, loading } = this.props;
+    return (
+      <div className="videoContainer">
+        {loading ? <p style={{ color: "white" }}>loading...</p> : null}
+        {src ? (
+          <iframe width="600px" height="400px" title="play" src={src} />
+        ) : null}
+      </div>
+    );
+  }
 }

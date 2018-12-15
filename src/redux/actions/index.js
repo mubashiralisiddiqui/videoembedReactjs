@@ -1,9 +1,8 @@
-export class AuthAction {
-    static DETAILS = "DETAILS";
+export class FetchActions {
+  static DETAILS = "DETAILS";
 
-    static getLinkDetails = (payload) => ({
-        type: AuthAction.DETAILS,
-        payload
-    })
-
+  static getLinkDetails = payload => ({
+    type: FetchActions.DETAILS,
+    payload
+  });
 }

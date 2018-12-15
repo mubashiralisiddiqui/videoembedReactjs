@@ -1,11 +1,5 @@
-/**
- *  importing components 
- */
-import SearchBar from './searchBar';
-import Videos from './Videos';
-
+// *  importing components
+import SearchBar from "./SearchBar";
+import Videos from "./Videos";
 // export
-export {
-    SearchBar,
-    Videos
-}
+export { SearchBar, Videos };
