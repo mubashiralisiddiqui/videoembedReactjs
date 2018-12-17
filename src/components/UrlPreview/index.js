@@ -1,16 +1,16 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 
 import "./style.css";
 
 export default class PreviewUrl extends Component {
   render() {
-    const { src, loading, title, previewUrl, description } = this.props;
+    const { src, loading, title, previewUrl, description, url } = this.props;
     return (
       <div className="preview">
         {loading ? (
           <p style={{ color: "white" }}>loading...</p>
         ) : src ? (
-          <Fragment>
+          <a href={url} target="_blank" className="previewContainer">
             <div className="imageContainer">
               <img
                 src={src}
@@ -27,7 +27,7 @@ export default class PreviewUrl extends Component {
                   : "no description available"}
               </p>
             </div>
-          </Fragment>
+          </a>
         ) : null}
       </div>
     );

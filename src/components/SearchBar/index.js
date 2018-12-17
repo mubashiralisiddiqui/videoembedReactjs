@@ -32,11 +32,6 @@ export default class SearchBar extends Component {
     }
   }
 
-  handleSubmit = () => {
-    const { urlSearch } = this.props;
-    urlSearch(this.state.url);
-  };
-
   render() {
     const { imageUrl, loading, title, previewUrl, description } = this.props;
     return (
@@ -48,12 +43,6 @@ export default class SearchBar extends Component {
             onChange={e => this.handleChange(e.target.value)}
             placeholder="Paste here!"
           />
-          <button
-            onClick={() => this.props.urlSearch(this.state.url)}
-            className="btn btn-primary btn-md"
-          >
-            search
-          </button>
         </div>
         <ImagePreview
           src={imageUrl}
@@ -61,6 +50,7 @@ export default class SearchBar extends Component {
           title={title}
           previewUrl={previewUrl}
           description={description}
+          url={this.state.url}
         />
       </Fragment>
     );

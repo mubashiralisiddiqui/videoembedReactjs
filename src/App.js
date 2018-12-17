@@ -18,6 +18,7 @@ class App extends Component {
     title: "",
     previewUrl: ""
   };
+
   // search url
   urlSearch = query => {
     this.setState({
@@ -31,54 +32,59 @@ class App extends Component {
     }
     let sourceUrl = "";
     if (query.includes("facebook.com") && query.includes("video")) {
-      sourceUrl = `https://www.facebook.com/plugins/video.php?href=${query}/&width=600&height=400`;
-      this.setState({ url: sourceUrl, loading: false });
+      sourceUrl = `https://www.facebook.com/plugins/video.php?href=${query}/&width=600&height=400&autoplay=1`;
+      return { sourceUrl };
     } else if (query.includes("youtube.com" && video_id)) {
-      sourceUrl = `https://www.youtube.com/embed/${video_id}`;
-      this.setState({ url: sourceUrl, loading: false });
+      sourceUrl = `https://www.youtube.com/embed/${video_id}?autoplay=1`;
+      return { sourceUrl };
     } else if (query.includes("vimeo.com")) {
       const vimeo_id = query.split("com/")[1];
-      sourceUrl = `https://player.vimeo.com/video/${vimeo_id && vimeo_id}`;
-      this.setState({ url: sourceUrl, loading: false });
+      sourceUrl = `https://player.vimeo.com/video/${vimeo_id &&
+        vimeo_id}?autoplay=1`;
+      return { sourceUrl };
     } else {
-      this.setState({ loading: false });
-      window.open(`${query}`, "_blank");
-      return;
+      return { sourceUrl: false };
     }
   };
+
   // handle url preview
   urlPreview = url => {
     this.setState({
       loading: true,
       imageUrl: ""
     });
-    axios
-      .get(`https://api.microlink.io/?url=${url}`)
-      .then(preview => {
-        const imageUrl = preview && preview.data.data.image.url;
-        const description = preview && preview.data.data.description;
-        const title = preview && preview.data.data.title;
-        const previewUrl = preview && preview.data.data.url;
-        let obj = {
-          imageUrl,
-          description,
-          title,
-          previewUrl
-        };
-        this.props.getDetails(obj);
-        this.setState({
-          imageUrl,
-          description,
-          title,
-          previewUrl,
-          loading: false
+    const response = this.urlSearch(url);
+    if (!response.sourceUrl) {
+      axios
+        .get(`https://api.microlink.io/?return true;url=${url}`)
+        .then(preview => {
+          const imageUrl = preview && preview.data.data.image.url;
+          const description = preview && preview.data.data.description;
+          const title = preview && preview.data.data.title;
+          const previewUrl = preview && preview.data.data.url;
+          let obj = {
+            imageUrl,
+            description,
+            title,
+            previewUrl
+          };
+          this.props.getDetails(obj);
+          this.setState({
+            imageUrl,
+            description,
+            title,
+            previewUrl,
+            loading: false
+          });
+        })
+        .catch(err => {
+          this.setState({
+            loading: false
+          });
         });
-      })
-      .catch(err => {
-        this.setState({
-          loading: false
-        });
-      });
+      return;
+    }
+    this.setState({ url: response.sourceUrl, loading: false });
   };
 
   render() {
@@ -95,12 +101,12 @@ class App extends Component {
       <div className="App viewport">
         <SearchBar
           urlPreview={url => this.urlPreview(url)}
-          urlSearch={url => this.urlSearch(url)}
           imageUrl={imageUrl}
           loading={loading}
           title={title}
           description={description}
           previewUrl={previewUrl}
+          url={url}
         />
         <Videos src={url} valid={valid} loading={loading} />
       </div>

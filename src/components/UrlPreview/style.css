@@ -9,6 +9,13 @@
   margin: 0px auto;
 }
 
+.previewContainer {
+  display: flex;
+  flex-direction: row;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .imageContainer {
   width: 25%;
 }
